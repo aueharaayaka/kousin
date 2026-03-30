@@ -4,9 +4,9 @@ import './ClientForm.css'
 const INITIAL_STATE = {
   agentName: '',
   clientName: '',
-  domain: { fee: '', billingAmount: '', paymentDate: '' },
-  server: { fee: '', billingAmount: '', paymentDate: '' },
-  ssl:    { fee: '', billingAmount: '', manualFee: '', paymentDate: '' },
+  domain: { fee: '', billingAmount: '', nextDueDate: '' },
+  server: { fee: '', billingAmount: '', nextDueDate: '' },
+  ssl:    { fee: '', billingAmount: '', manualFee: '', nextDueDate: '' },
 }
 
 export default function ClientForm({ client, onSubmit, onClose }) {
@@ -14,9 +14,9 @@ export default function ClientForm({ client, onSubmit, onClose }) {
     client
       ? {
           ...client,
-          domain: { fee: client.domain?.fee ?? '', billingAmount: client.domain?.billingAmount ?? '', paymentDate: client.domain?.paymentDate ?? '', nextDueDate: client.domain?.nextDueDate ?? '' },
-          server: { fee: client.server?.fee ?? '', billingAmount: client.server?.billingAmount ?? '', paymentDate: client.server?.paymentDate ?? '', nextDueDate: client.server?.nextDueDate ?? '' },
-          ssl:    { fee: client.ssl?.fee ?? '', billingAmount: client.ssl?.billingAmount ?? '', manualFee: client.ssl?.manualFee ?? '', paymentDate: client.ssl?.paymentDate ?? '', nextDueDate: client.ssl?.nextDueDate ?? '' },
+          domain: { fee: client.domain?.fee ?? '', billingAmount: client.domain?.billingAmount ?? '', nextDueDate: client.domain?.nextDueDate ?? client.domain?.paymentDate ?? '' },
+          server: { fee: client.server?.fee ?? '', billingAmount: client.server?.billingAmount ?? '', nextDueDate: client.server?.nextDueDate ?? client.server?.paymentDate ?? '' },
+          ssl:    { fee: client.ssl?.fee ?? '', billingAmount: client.ssl?.billingAmount ?? '', manualFee: client.ssl?.manualFee ?? '', nextDueDate: client.ssl?.nextDueDate ?? client.ssl?.paymentDate ?? '' },
         }
       : INITIAL_STATE
   )
@@ -111,8 +111,8 @@ export default function ClientForm({ client, onSubmit, onClose }) {
             </div>
             <div className="form-group">
               <label>支払日</label>
-              <input type="date" value={form.domain.paymentDate}
-                onChange={(e) => handleServiceChange('domain', 'paymentDate', e.target.value)} />
+              <input type="date" value={form.domain.nextDueDate}
+                onChange={(e) => handleServiceChange('domain', 'nextDueDate', e.target.value)} />
             </div>
           </div>
 
@@ -135,8 +135,8 @@ export default function ClientForm({ client, onSubmit, onClose }) {
             </div>
             <div className="form-group">
               <label>支払日</label>
-              <input type="date" value={form.server.paymentDate}
-                onChange={(e) => handleServiceChange('server', 'paymentDate', e.target.value)} />
+              <input type="date" value={form.server.nextDueDate}
+                onChange={(e) => handleServiceChange('server', 'nextDueDate', e.target.value)} />
             </div>
           </div>
 
@@ -166,8 +166,8 @@ export default function ClientForm({ client, onSubmit, onClose }) {
               </div>
               <div className="form-group">
                 <label>支払日</label>
-                <input type="date" value={form.ssl.paymentDate}
-                  onChange={(e) => handleServiceChange('ssl', 'paymentDate', e.target.value)} />
+                <input type="date" value={form.ssl.nextDueDate}
+                  onChange={(e) => handleServiceChange('ssl', 'nextDueDate', e.target.value)} />
               </div>
             </div>
           </div>

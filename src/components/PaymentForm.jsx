@@ -21,7 +21,8 @@ const RECURRING_OPTIONS = [
 ]
 
 const INITIAL_STATE = {
-  title: '',
+  agent: '',
+  client: '',
   serviceType: '',
   amount: '',
   dueDate: '',
@@ -35,6 +36,8 @@ const INITIAL_STATE = {
 export default function PaymentForm({ payment, onSubmit, onClose }) {
   const [form, setForm] = useState(payment ? {
     ...payment,
+    agent: payment.agent || '',
+    client: payment.client || payment.title || '',
     amount: payment.amount.toString(),
     nextDueDate: '',
   } : INITIAL_STATE)
@@ -42,7 +45,7 @@ export default function PaymentForm({ payment, onSubmit, onClose }) {
 
   const validate = () => {
     const errs = {}
-    if (!form.title.trim()) errs.title = 'タイトルを入力してください'
+    if (!form.client.trim()) errs.client = 'クライアントを入力してください'
     if (!form.amount || isNaN(Number(form.amount)) || Number(form.amount) <= 0)
       errs.amount = '正しい金額を入力してください'
     if (!form.dueDate) errs.dueDate = '引き落とし日を選択してください'
@@ -66,7 +69,7 @@ export default function PaymentForm({ payment, onSubmit, onClose }) {
       setErrors(errs)
       return
     }
-    onSubmit({ ...form, amount: Number(form.amount) })
+    onSubmit({ ...form, title: form.client, amount: Number(form.amount) })
   }
 
   return (
@@ -78,16 +81,27 @@ export default function PaymentForm({ payment, onSubmit, onClose }) {
         </div>
         <form onSubmit={handleSubmit} className="payment-form">
           <div className="form-group">
-            <label>タイトル <span className="required">*</span></label>
+            <label>エージェント</label>
             <input
               type="text"
-              name="title"
-              value={form.title}
+              name="agent"
+              value={form.agent}
+              onChange={handleChange}
+              placeholder="例: エージェント名"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>クライアント <span className="required">*</span></label>
+            <input
+              type="text"
+              name="client"
+              value={form.client}
               onChange={handleChange}
               placeholder="例: example.com"
-              className={errors.title ? 'error' : ''}
+              className={errors.client ? 'error' : ''}
             />
-            {errors.title && <span className="error-msg">{errors.title}</span>}
+            {errors.client && <span className="error-msg">{errors.client}</span>}
             <div className="service-type-group">
               {SERVICE_TYPES.map(type => (
                 <button

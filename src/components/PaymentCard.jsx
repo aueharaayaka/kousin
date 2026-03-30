@@ -4,16 +4,6 @@ import './PaymentCard.css'
 const formatCurrency = (amount) =>
   new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(amount)
 
-const CATEGORY_LABELS = {
-  housing: '住居費',
-  utilities: '光熱費',
-  credit: 'クレジット',
-  insurance: '保険',
-  subscription: 'サブスク',
-  tax: '税金',
-  other: 'その他',
-}
-
 const STATUS_CONFIG = {
   pending: { label: '未払い', color: '#3b82f6', bg: '#eff6ff' },
   overdue: { label: '期限超過', color: '#ef4444', bg: '#fef2f2' },
@@ -50,11 +40,16 @@ export default function PaymentCard({ payment, onEdit, onDelete, onMarkPaid }) {
     return 'due-normal'
   }
 
+  const clientName = payment.client || payment.title
+
   return (
     <div className={`payment-card status-${payment.status}`}>
       <div className="card-left">
+        {payment.agent && (
+          <div className="card-agent">{payment.agent}</div>
+        )}
         <div className="card-header-row">
-          <div className="card-title">{payment.title}</div>
+          <div className="card-title">{clientName}</div>
           {payment.serviceType && (
             <span className="service-type-badge">{payment.serviceType}</span>
           )}

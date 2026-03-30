@@ -1,20 +1,12 @@
 import React, { useState } from 'react'
 import './ClientForm.css'
 
-const SERVICE_KEYS = [
-  { key: 'domain', label: 'ドメイン' },
-  { key: 'server', label: 'サーバー' },
-  { key: 'ssl', label: 'SSL' },
-]
-
-const EMPTY_SERVICE = { fee: '', billingAmount: '', nextDueDate: '' }
-
 const INITIAL_STATE = {
   agentName: '',
   clientName: '',
-  domain: { ...EMPTY_SERVICE },
-  server: { ...EMPTY_SERVICE },
-  ssl: { ...EMPTY_SERVICE },
+  domain: { fee: '', billingAmount: '' },
+  server: { fee: '', billingAmount: '' },
+  ssl:    { fee: '', billingAmount: '', manualFee: '' },
 }
 
 export default function ClientForm({ client, onSubmit, onClose }) {
@@ -24,7 +16,7 @@ export default function ClientForm({ client, onSubmit, onClose }) {
           ...client,
           domain: { fee: client.domain?.fee ?? '', billingAmount: client.domain?.billingAmount ?? '', nextDueDate: client.domain?.nextDueDate ?? '' },
           server: { fee: client.server?.fee ?? '', billingAmount: client.server?.billingAmount ?? '', nextDueDate: client.server?.nextDueDate ?? '' },
-          ssl:    { fee: client.ssl?.fee ?? '',    billingAmount: client.ssl?.billingAmount ?? '',    nextDueDate: client.ssl?.nextDueDate ?? ''    },
+          ssl:    { fee: client.ssl?.fee ?? '', billingAmount: client.ssl?.billingAmount ?? '', manualFee: client.ssl?.manualFee ?? '', nextDueDate: client.ssl?.nextDueDate ?? '' },
         }
       : INITIAL_STATE
   )
@@ -62,7 +54,7 @@ export default function ClientForm({ client, onSubmit, onClose }) {
       ...form,
       domain: { ...form.domain, fee: toNum(form.domain.fee), billingAmount: toNum(form.domain.billingAmount) },
       server: { ...form.server, fee: toNum(form.server.fee), billingAmount: toNum(form.server.billingAmount) },
-      ssl:    { ...form.ssl,    fee: toNum(form.ssl.fee),    billingAmount: toNum(form.ssl.billingAmount)    },
+      ssl:    { ...form.ssl,    fee: toNum(form.ssl.fee),    billingAmount: toNum(form.ssl.billingAmount), manualFee: toNum(form.ssl.manualFee) },
     })
   }
 
@@ -100,41 +92,89 @@ export default function ClientForm({ client, onSubmit, onClose }) {
 
           <div className="services-divider">サービス詳細</div>
 
-          {SERVICE_KEYS.map(({ key, label }) => (
-            <div key={key} className={`service-section service-section-${key}`}>
-              <div className="service-section-title">{label}</div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>管理費 (円)</label>
-                  <input
-                    type="number"
-                    value={form[key].fee}
-                    onChange={(e) => handleServiceChange(key, 'fee', e.target.value)}
-                    placeholder="0"
-                    min="0"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>請求額 (円)</label>
-                  <input
-                    type="number"
-                    value={form[key].billingAmount}
-                    onChange={(e) => handleServiceChange(key, 'billingAmount', e.target.value)}
-                    placeholder="0"
-                    min="0"
-                  />
-                </div>
+          {/* ドメイン */}
+          <div className="service-section service-section-domain">
+            <div className="service-section-title">ドメイン</div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>管理費 (円)</label>
+                <input
+                  type="number"
+                  value={form.domain.fee}
+                  onChange={(e) => handleServiceChange('domain', 'fee', e.target.value)}
+                  placeholder="0" min="0"
+                />
               </div>
               <div className="form-group">
-                <label>次回支払い予定日</label>
+                <label>請求額 (円)</label>
                 <input
-                  type="date"
-                  value={form[key].nextDueDate}
-                  onChange={(e) => handleServiceChange(key, 'nextDueDate', e.target.value)}
+                  type="number"
+                  value={form.domain.billingAmount}
+                  onChange={(e) => handleServiceChange('domain', 'billingAmount', e.target.value)}
+                  placeholder="0" min="0"
                 />
               </div>
             </div>
-          ))}
+          </div>
+
+          {/* サーバー */}
+          <div className="service-section service-section-server">
+            <div className="service-section-title">サーバー</div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>管理費 (円)</label>
+                <input
+                  type="number"
+                  value={form.server.fee}
+                  onChange={(e) => handleServiceChange('server', 'fee', e.target.value)}
+                  placeholder="0" min="0"
+                />
+              </div>
+              <div className="form-group">
+                <label>請求額 (円)</label>
+                <input
+                  type="number"
+                  value={form.server.billingAmount}
+                  onChange={(e) => handleServiceChange('server', 'billingAmount', e.target.value)}
+                  placeholder="0" min="0"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* SSL */}
+          <div className="service-section service-section-ssl">
+            <div className="service-section-title">SSL</div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>管理費 (円)</label>
+                <input
+                  type="number"
+                  value={form.ssl.fee}
+                  onChange={(e) => handleServiceChange('ssl', 'fee', e.target.value)}
+                  placeholder="0" min="0"
+                />
+              </div>
+              <div className="form-group">
+                <label>請求額 (円)</label>
+                <input
+                  type="number"
+                  value={form.ssl.billingAmount}
+                  onChange={(e) => handleServiceChange('ssl', 'billingAmount', e.target.value)}
+                  placeholder="0" min="0"
+                />
+              </div>
+            </div>
+            <div className="form-group">
+              <label>手動代行費 (円)</label>
+              <input
+                type="number"
+                value={form.ssl.manualFee}
+                onChange={(e) => handleServiceChange('ssl', 'manualFee', e.target.value)}
+                placeholder="0" min="0"
+              />
+            </div>
+          </div>
 
           <div className="form-actions">
             <button type="button" className="btn btn-secondary" onClick={onClose}>

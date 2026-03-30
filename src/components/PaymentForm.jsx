@@ -1,6 +1,12 @@
 import React, { useState } from 'react'
 import './PaymentForm.css'
 
+const TITLE_OPTIONS = [
+  { value: 'サーバー', label: 'サーバー' },
+  { value: 'ドメイン', label: 'ドメイン' },
+  { value: 'SSL', label: 'SSL' },
+]
+
 const CATEGORIES = [
   { value: 'housing', label: '住居費' },
   { value: 'utilities', label: '光熱費' },
@@ -19,7 +25,7 @@ const RECURRING_OPTIONS = [
 ]
 
 const INITIAL_STATE = {
-  title: '',
+  title: 'サーバー',
   amount: '',
   dueDate: '',
   category: 'other',
@@ -37,10 +43,10 @@ export default function PaymentForm({ payment, onSubmit, onClose }) {
 
   const validate = () => {
     const errs = {}
-    if (!form.title.trim()) errs.title = 'タイトルを入力してください'
+    if (!form.title) errs.title = 'タイトルを選択してください'
     if (!form.amount || isNaN(Number(form.amount)) || Number(form.amount) <= 0)
       errs.amount = '正しい金額を入力してください'
-    if (!form.dueDate) errs.dueDate = '期日を選択してください'
+    if (!form.dueDate) errs.dueDate = '引き落とし日を選択してください'
     return errs
   }
 
@@ -70,14 +76,16 @@ export default function PaymentForm({ payment, onSubmit, onClose }) {
         <form onSubmit={handleSubmit} className="payment-form">
           <div className="form-group">
             <label>タイトル <span className="required">*</span></label>
-            <input
-              type="text"
+            <select
               name="title"
               value={form.title}
               onChange={handleChange}
-              placeholder="例: 家賃、電気代..."
               className={errors.title ? 'error' : ''}
-            />
+            >
+              {TITLE_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
             {errors.title && <span className="error-msg">{errors.title}</span>}
           </div>
 
@@ -96,7 +104,7 @@ export default function PaymentForm({ payment, onSubmit, onClose }) {
               {errors.amount && <span className="error-msg">{errors.amount}</span>}
             </div>
             <div className="form-group">
-              <label>期日 <span className="required">*</span></label>
+              <label>引き落とし日 <span className="required">*</span></label>
               <input
                 type="date"
                 name="dueDate"

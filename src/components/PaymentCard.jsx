@@ -36,10 +36,10 @@ export default function PaymentCard({ payment, onEdit, onDelete, onMarkPaid }) {
   const status = STATUS_CONFIG[payment.status]
 
   const getDueDateLabel = () => {
-    if (payment.status === 'paid') return `支払日: ${payment.dueDate}`
+    if (payment.status === 'paid') return `引き落とし日: ${payment.dueDate}`
     if (diff < 0) return `${Math.abs(diff)}日超過`
-    if (diff === 0) return '今日が期限'
-    if (diff === 1) return '明日が期限'
+    if (diff === 0) return '今日が引き落とし日'
+    if (diff === 1) return '明日が引き落とし日'
     return `${diff}日後 (${payment.dueDate})`
   }
 

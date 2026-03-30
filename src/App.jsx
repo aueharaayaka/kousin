@@ -9,13 +9,6 @@ const SERVICE_LABELS = { domain: 'ドメイン', server: 'サーバー', ssl: 'S
 const formatCurrency = (amount) =>
   new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(Number(amount) || 0)
 
-const advanceOneYear = (dateStr) => {
-  if (!dateStr) return ''
-  const d = new Date(dateStr + 'T00:00:00')
-  d.setFullYear(d.getFullYear() + 1)
-  return d.toISOString().split('T')[0]
-}
-
 export default function App() {
   const [clients, setClients] = useState(() => {
     try {
@@ -59,13 +52,12 @@ export default function App() {
     setClients(prev => prev.filter(c => c.id !== id))
   }
 
-  const markPaid = (clientId, serviceType) => {
+  const updateNextDueDate = (clientId, serviceType, nextDueDate) => {
     setClients(prev => prev.map(c => {
       if (c.id !== clientId) return c
-      const service = c[serviceType]
       return {
         ...c,
-        [serviceType]: { ...service, nextDueDate: advanceOneYear(service.nextDueDate) },
+        [serviceType]: { ...c[serviceType], nextDueDate },
       }
     }))
   }
@@ -131,12 +123,17 @@ export default function App() {
                   </div>
                   <div className="monthly-item-right">
                     <div className="item-fee">{formatCurrency(service.billingAmount || service.fee)}</div>
-                    <button
-                      className="btn btn-sm btn-success"
-                      onClick={() => markPaid(client.id, serviceType)}
-                    >
-                      支払済にする
-                    </button>
+                    <div className="next-due-group">
+                      <span className="next-due-label">次回支払い予定日</span>
+                      <input
+                        type="date"
+                        className="next-due-input"
+                        defaultValue=""
+                        onBlur={(e) => {
+                          if (e.target.value) updateNextDueDate(client.id, serviceType, e.target.value)
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               ))}

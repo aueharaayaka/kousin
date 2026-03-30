@@ -121,7 +121,7 @@
 
 .monthly-item {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
   padding: 14px 24px;
@@ -171,9 +171,8 @@
 
 .monthly-item-right {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
+  align-items: center;
+  gap: 20px;
   flex-shrink: 0;
 }
 
@@ -184,23 +183,20 @@
   letter-spacing: -0.5px;
 }
 
-/* Paid confirm inline */
-.paid-confirm {
+.next-due-group {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
 }
 
-.paid-confirm-label {
-  font-size: 12px;
+.next-due-label {
+  font-size: 11px;
   font-weight: 600;
-  color: #374151;
-  white-space: nowrap;
+  color: #9ca3af;
 }
 
-.paid-date-input {
+.next-due-input {
   padding: 5px 10px;
   border: 1.5px solid #e5e7eb;
   border-radius: 8px;
@@ -211,7 +207,7 @@
   transition: border-color 0.2s;
 }
 
-.paid-date-input:focus {
+.next-due-input:focus {
   border-color: #e94560;
 }
 
@@ -322,13 +318,6 @@
 .btn-primary:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(233,69,96,0.5);
-}
-
-.btn-primary:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
 }
 
 .btn-secondary {

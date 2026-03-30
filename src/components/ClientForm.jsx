@@ -4,9 +4,9 @@ import './ClientForm.css'
 const INITIAL_STATE = {
   agentName: '',
   clientName: '',
-  domain: { fee: '', billingAmount: '' },
-  server: { fee: '', billingAmount: '' },
-  ssl:    { fee: '', billingAmount: '', manualFee: '' },
+  domain: { fee: '', billingAmount: '', paymentDate: '' },
+  server: { fee: '', billingAmount: '', paymentDate: '' },
+  ssl:    { fee: '', billingAmount: '', manualFee: '', paymentDate: '' },
 }
 
 export default function ClientForm({ client, onSubmit, onClose }) {
@@ -14,9 +14,9 @@ export default function ClientForm({ client, onSubmit, onClose }) {
     client
       ? {
           ...client,
-          domain: { fee: client.domain?.fee ?? '', billingAmount: client.domain?.billingAmount ?? '', nextDueDate: client.domain?.nextDueDate ?? '' },
-          server: { fee: client.server?.fee ?? '', billingAmount: client.server?.billingAmount ?? '', nextDueDate: client.server?.nextDueDate ?? '' },
-          ssl:    { fee: client.ssl?.fee ?? '', billingAmount: client.ssl?.billingAmount ?? '', manualFee: client.ssl?.manualFee ?? '', nextDueDate: client.ssl?.nextDueDate ?? '' },
+          domain: { fee: client.domain?.fee ?? '', billingAmount: client.domain?.billingAmount ?? '', paymentDate: client.domain?.paymentDate ?? '', nextDueDate: client.domain?.nextDueDate ?? '' },
+          server: { fee: client.server?.fee ?? '', billingAmount: client.server?.billingAmount ?? '', paymentDate: client.server?.paymentDate ?? '', nextDueDate: client.server?.nextDueDate ?? '' },
+          ssl:    { fee: client.ssl?.fee ?? '', billingAmount: client.ssl?.billingAmount ?? '', manualFee: client.ssl?.manualFee ?? '', paymentDate: client.ssl?.paymentDate ?? '', nextDueDate: client.ssl?.nextDueDate ?? '' },
         }
       : INITIAL_STATE
   )
@@ -98,22 +98,21 @@ export default function ClientForm({ client, onSubmit, onClose }) {
             <div className="form-row">
               <div className="form-group">
                 <label>管理費 (円)</label>
-                <input
-                  type="number"
-                  value={form.domain.fee}
+                <input type="number" value={form.domain.fee}
                   onChange={(e) => handleServiceChange('domain', 'fee', e.target.value)}
-                  placeholder="0" min="0"
-                />
+                  placeholder="0" min="0" />
               </div>
               <div className="form-group">
                 <label>請求額 (円)</label>
-                <input
-                  type="number"
-                  value={form.domain.billingAmount}
+                <input type="number" value={form.domain.billingAmount}
                   onChange={(e) => handleServiceChange('domain', 'billingAmount', e.target.value)}
-                  placeholder="0" min="0"
-                />
+                  placeholder="0" min="0" />
               </div>
+            </div>
+            <div className="form-group">
+              <label>支払日</label>
+              <input type="date" value={form.domain.paymentDate}
+                onChange={(e) => handleServiceChange('domain', 'paymentDate', e.target.value)} />
             </div>
           </div>
 
@@ -123,22 +122,21 @@ export default function ClientForm({ client, onSubmit, onClose }) {
             <div className="form-row">
               <div className="form-group">
                 <label>管理費 (円)</label>
-                <input
-                  type="number"
-                  value={form.server.fee}
+                <input type="number" value={form.server.fee}
                   onChange={(e) => handleServiceChange('server', 'fee', e.target.value)}
-                  placeholder="0" min="0"
-                />
+                  placeholder="0" min="0" />
               </div>
               <div className="form-group">
                 <label>請求額 (円)</label>
-                <input
-                  type="number"
-                  value={form.server.billingAmount}
+                <input type="number" value={form.server.billingAmount}
                   onChange={(e) => handleServiceChange('server', 'billingAmount', e.target.value)}
-                  placeholder="0" min="0"
-                />
+                  placeholder="0" min="0" />
               </div>
+            </div>
+            <div className="form-group">
+              <label>支払日</label>
+              <input type="date" value={form.server.paymentDate}
+                onChange={(e) => handleServiceChange('server', 'paymentDate', e.target.value)} />
             </div>
           </div>
 
@@ -148,31 +146,29 @@ export default function ClientForm({ client, onSubmit, onClose }) {
             <div className="form-row">
               <div className="form-group">
                 <label>管理費 (円)</label>
-                <input
-                  type="number"
-                  value={form.ssl.fee}
+                <input type="number" value={form.ssl.fee}
                   onChange={(e) => handleServiceChange('ssl', 'fee', e.target.value)}
-                  placeholder="0" min="0"
-                />
+                  placeholder="0" min="0" />
               </div>
               <div className="form-group">
                 <label>請求額 (円)</label>
-                <input
-                  type="number"
-                  value={form.ssl.billingAmount}
+                <input type="number" value={form.ssl.billingAmount}
                   onChange={(e) => handleServiceChange('ssl', 'billingAmount', e.target.value)}
-                  placeholder="0" min="0"
-                />
+                  placeholder="0" min="0" />
               </div>
             </div>
-            <div className="form-group">
-              <label>手動代行費 (円)</label>
-              <input
-                type="number"
-                value={form.ssl.manualFee}
-                onChange={(e) => handleServiceChange('ssl', 'manualFee', e.target.value)}
-                placeholder="0" min="0"
-              />
+            <div className="form-row">
+              <div className="form-group">
+                <label>手動代行費 (円)</label>
+                <input type="number" value={form.ssl.manualFee}
+                  onChange={(e) => handleServiceChange('ssl', 'manualFee', e.target.value)}
+                  placeholder="0" min="0" />
+              </div>
+              <div className="form-group">
+                <label>支払日</label>
+                <input type="date" value={form.ssl.paymentDate}
+                  onChange={(e) => handleServiceChange('ssl', 'paymentDate', e.target.value)} />
+              </div>
             </div>
           </div>
 

@@ -62,7 +62,6 @@
   gap: 24px;
 }
 
-/* Section */
 .section {
   background: white;
   border-radius: 16px;
@@ -71,7 +70,7 @@
 }
 
 .section-header {
-  padding: 20px 24px;
+  padding: 18px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -100,7 +99,6 @@
   border-color: #e94560;
 }
 
-/* Empty state */
 .empty-state {
   padding: 40px;
   text-align: center;
@@ -118,12 +116,12 @@
 
 /* Monthly payments */
 .monthly-list {
-  padding: 8px 0;
+  padding: 4px 0;
 }
 
 .monthly-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
   padding: 14px 24px;
@@ -186,6 +184,37 @@
   letter-spacing: -0.5px;
 }
 
+/* Paid confirm inline */
+.paid-confirm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.paid-confirm-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.paid-date-input {
+  padding: 5px 10px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #1a1a2e;
+  outline: none;
+  background: white;
+  transition: border-color 0.2s;
+}
+
+.paid-date-input:focus {
+  border-color: #e94560;
+}
+
 /* Service badges */
 .service-badge {
   font-size: 11px;
@@ -194,20 +223,9 @@
   border-radius: 20px;
 }
 
-.service-domain {
-  background: #dbeafe;
-  color: #1d4ed8;
-}
-
-.service-server {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.service-ssl {
-  background: #fef3c7;
-  color: #92400e;
-}
+.service-domain { background: #dbeafe; color: #1d4ed8; }
+.service-server { background: #dcfce7; color: #166534; }
+.service-ssl    { background: #fef3c7; color: #92400e; }
 
 /* Client grid */
 .client-grid {
@@ -304,6 +322,13 @@
 .btn-primary:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(233,69,96,0.5);
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .btn-secondary {

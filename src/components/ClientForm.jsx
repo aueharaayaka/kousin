@@ -7,7 +7,7 @@ const SERVICE_KEYS = [
   { key: 'ssl', label: 'SSL' },
 ]
 
-const EMPTY_SERVICE = { fee: '', nextDueDate: '' }
+const EMPTY_SERVICE = { fee: '', billingAmount: '', nextDueDate: '' }
 
 const INITIAL_STATE = {
   agentName: '',
@@ -22,9 +22,9 @@ export default function ClientForm({ client, onSubmit, onClose }) {
     client
       ? {
           ...client,
-          domain: { fee: client.domain?.fee ?? '', nextDueDate: client.domain?.nextDueDate ?? '' },
-          server: { fee: client.server?.fee ?? '', nextDueDate: client.server?.nextDueDate ?? '' },
-          ssl: { fee: client.ssl?.fee ?? '', nextDueDate: client.ssl?.nextDueDate ?? '' },
+          domain: { fee: client.domain?.fee ?? '', billingAmount: client.domain?.billingAmount ?? '', nextDueDate: client.domain?.nextDueDate ?? '' },
+          server: { fee: client.server?.fee ?? '', billingAmount: client.server?.billingAmount ?? '', nextDueDate: client.server?.nextDueDate ?? '' },
+          ssl:    { fee: client.ssl?.fee ?? '',    billingAmount: client.ssl?.billingAmount ?? '',    nextDueDate: client.ssl?.nextDueDate ?? ''    },
         }
       : INITIAL_STATE
   )
@@ -49,6 +49,8 @@ export default function ClientForm({ client, onSubmit, onClose }) {
     }))
   }
 
+  const toNum = (v) => v !== '' ? Number(v) : ''
+
   const handleSubmit = (e) => {
     e.preventDefault()
     const errs = validate()
@@ -58,9 +60,9 @@ export default function ClientForm({ client, onSubmit, onClose }) {
     }
     onSubmit({
       ...form,
-      domain: { ...form.domain, fee: form.domain.fee !== '' ? Number(form.domain.fee) : '' },
-      server: { ...form.server, fee: form.server.fee !== '' ? Number(form.server.fee) : '' },
-      ssl: { ...form.ssl, fee: form.ssl.fee !== '' ? Number(form.ssl.fee) : '' },
+      domain: { ...form.domain, fee: toNum(form.domain.fee), billingAmount: toNum(form.domain.billingAmount) },
+      server: { ...form.server, fee: toNum(form.server.fee), billingAmount: toNum(form.server.billingAmount) },
+      ssl:    { ...form.ssl,    fee: toNum(form.ssl.fee),    billingAmount: toNum(form.ssl.billingAmount)    },
     })
   }
 
@@ -113,13 +115,23 @@ export default function ClientForm({ client, onSubmit, onClose }) {
                   />
                 </div>
                 <div className="form-group">
-                  <label>次回支払い予定日</label>
+                  <label>請求額 (円)</label>
                   <input
-                    type="date"
-                    value={form[key].nextDueDate}
-                    onChange={(e) => handleServiceChange(key, 'nextDueDate', e.target.value)}
+                    type="number"
+                    value={form[key].billingAmount}
+                    onChange={(e) => handleServiceChange(key, 'billingAmount', e.target.value)}
+                    placeholder="0"
+                    min="0"
                   />
                 </div>
+              </div>
+              <div className="form-group">
+                <label>次回支払い予定日</label>
+                <input
+                  type="date"
+                  value={form[key].nextDueDate}
+                  onChange={(e) => handleServiceChange(key, 'nextDueDate', e.target.value)}
+                />
               </div>
             </div>
           ))}

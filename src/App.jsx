@@ -9,13 +9,6 @@ const SERVICE_LABELS = { domain: 'ドメイン', server: 'サーバー', ssl: 'S
 const formatCurrency = (amount) =>
   new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(Number(amount) || 0)
 
-const advanceOneYear = (dateStr) => {
-  if (!dateStr) return ''
-  const d = new Date(dateStr + 'T00:00:00')
-  d.setFullYear(d.getFullYear() + 1)
-  return d.toISOString().split('T')[0]
-}
-
 export default function App() {
   const [clients, setClients] = useState(() => {
     try {
@@ -29,6 +22,8 @@ export default function App() {
     const now = new Date()
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
   })
+  // { clientId, serviceType, nextDate } | null
+  const [pendingPaid, setPendingPaid] = useState(null)
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(clients))
@@ -59,15 +54,20 @@ export default function App() {
     setClients(prev => prev.filter(c => c.id !== id))
   }
 
-  const markPaid = (clientId, serviceType) => {
+  const initMarkPaid = (clientId, serviceType, currentDate) => {
+    setPendingPaid({ clientId, serviceType, nextDate: '' })
+  }
+
+  const confirmMarkPaid = () => {
+    const { clientId, serviceType, nextDate } = pendingPaid
     setClients(prev => prev.map(c => {
       if (c.id !== clientId) return c
-      const service = c[serviceType]
       return {
         ...c,
-        [serviceType]: { ...service, nextDueDate: advanceOneYear(service.nextDueDate) },
+        [serviceType]: { ...c[serviceType], nextDueDate: nextDate },
       }
     }))
+    setPendingPaid(null)
   }
 
   const handleEdit = (client) => {
@@ -115,31 +115,64 @@ export default function App() {
             </div>
           ) : (
             <div className="monthly-list">
-              {monthlyPayments.map(({ client, serviceType, service }) => (
-                <div key={`${client.id}-${serviceType}`} className="monthly-item">
-                  <div className="monthly-item-left">
-                    {client.agentName && (
-                      <div className="item-agent">{client.agentName}</div>
-                    )}
-                    <div className="item-client">{client.clientName}</div>
-                    <div className="item-meta">
-                      <span className={`service-badge service-${serviceType}`}>
-                        {SERVICE_LABELS[serviceType]}
-                      </span>
-                      <span className="item-date">{service.nextDueDate}</span>
+              {monthlyPayments.map(({ client, serviceType, service }) => {
+                const isPending =
+                  pendingPaid?.clientId === client.id &&
+                  pendingPaid?.serviceType === serviceType
+                return (
+                  <div key={`${client.id}-${serviceType}`} className="monthly-item">
+                    <div className="monthly-item-left">
+                      {client.agentName && (
+                        <div className="item-agent">{client.agentName}</div>
+                      )}
+                      <div className="item-client">{client.clientName}</div>
+                      <div className="item-meta">
+                        <span className={`service-badge service-${serviceType}`}>
+                          {SERVICE_LABELS[serviceType]}
+                        </span>
+                        <span className="item-date">{service.nextDueDate}</span>
+                      </div>
+                    </div>
+                    <div className="monthly-item-right">
+                      <div className="item-fee">{formatCurrency(service.billingAmount || service.fee)}</div>
+                      {isPending ? (
+                        <div className="paid-confirm">
+                          <span className="paid-confirm-label">次回支払い予定日</span>
+                          <input
+                            type="date"
+                            className="paid-date-input"
+                            value={pendingPaid.nextDate}
+                            onChange={(e) =>
+                              setPendingPaid(prev => ({ ...prev, nextDate: e.target.value }))
+                            }
+                            autoFocus
+                          />
+                          <button
+                            className="btn btn-sm btn-primary"
+                            onClick={confirmMarkPaid}
+                            disabled={!pendingPaid.nextDate}
+                          >
+                            確定
+                          </button>
+                          <button
+                            className="btn btn-sm btn-secondary"
+                            onClick={() => setPendingPaid(null)}
+                          >
+                            キャンセル
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          className="btn btn-sm btn-success"
+                          onClick={() => initMarkPaid(client.id, serviceType, service.nextDueDate)}
+                        >
+                          支払済にする
+                        </button>
+                      )}
                     </div>
                   </div>
-                  <div className="monthly-item-right">
-                    <div className="item-fee">{formatCurrency(service.fee)}</div>
-                    <button
-                      className="btn btn-sm btn-success"
-                      onClick={() => markPaid(client.id, serviceType)}
-                    >
-                      支払済にする
-                    </button>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
@@ -188,7 +221,9 @@ function ClientCard({ client, onEdit, onDelete }) {
     { key: 'ssl', label: 'SSL' },
   ]
 
-  const hasServices = services.some(({ key }) => client[key]?.fee || client[key]?.nextDueDate)
+  const hasServices = services.some(
+    ({ key }) => client[key]?.fee || client[key]?.billingAmount || client[key]?.nextDueDate
+  )
 
   return (
     <div className="client-card">
@@ -202,7 +237,7 @@ function ClientCard({ client, onEdit, onDelete }) {
         <div className="client-services">
           {services.map(({ key, label }) => {
             const s = client[key]
-            if (!s?.fee && !s?.nextDueDate) return null
+            if (!s?.fee && !s?.billingAmount && !s?.nextDueDate) return null
             return (
               <div key={key} className="client-service-row">
                 <span className={`service-badge service-${key}`}>{label}</span>

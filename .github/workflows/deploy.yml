@@ -3,7 +3,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - claude/payment-schedule-app-1ddmM
+      - main
+      - claude/update-payment-form-n4KkH
 
 permissions:
   contents: write

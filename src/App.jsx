@@ -121,8 +121,29 @@ export default function App() {
                       <span className="item-date">{service.nextDueDate}</span>
                     </div>
                   </div>
+
+                  <div className="monthly-item-amounts">
+                    {service.fee !== '' && service.fee !== undefined && (
+                      <div className="amount-row">
+                        <span className="amount-label">管理費</span>
+                        <span className="amount-value">{formatCurrency(service.fee)}</span>
+                      </div>
+                    )}
+                    {service.billingAmount !== '' && service.billingAmount !== undefined && (
+                      <div className="amount-row">
+                        <span className="amount-label">請求額</span>
+                        <span className="amount-value amount-billing">{formatCurrency(service.billingAmount)}</span>
+                      </div>
+                    )}
+                    {serviceType === 'ssl' && service.manualFee !== '' && service.manualFee !== undefined && (
+                      <div className="amount-row">
+                        <span className="amount-label">手動代行費</span>
+                        <span className="amount-value">{formatCurrency(service.manualFee)}</span>
+                      </div>
+                    )}
+                  </div>
+
                   <div className="monthly-item-right">
-                    <div className="item-fee">{formatCurrency(service.billingAmount || service.fee)}</div>
                     <div className="next-due-group">
                       <span className="next-due-label">次回支払い予定日</span>
                       <input

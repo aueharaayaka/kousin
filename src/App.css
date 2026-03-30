@@ -105,37 +105,23 @@
   color: #9ca3af;
 }
 
-.empty-icon {
-  font-size: 32px;
-  margin-bottom: 10px;
-}
-
-.empty-state p {
-  font-size: 14px;
-}
+.empty-icon { font-size: 32px; margin-bottom: 10px; }
+.empty-state p { font-size: 14px; }
 
 /* Monthly payments */
-.monthly-list {
-  padding: 4px 0;
-}
+.monthly-list { padding: 4px 0; }
 
 .monthly-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  gap: 20px;
   padding: 14px 24px;
   border-bottom: 1px solid #f5f6fa;
   transition: background 0.15s;
 }
 
-.monthly-item:last-child {
-  border-bottom: none;
-}
-
-.monthly-item:hover {
-  background: #fafafa;
-}
+.monthly-item:last-child { border-bottom: none; }
+.monthly-item:hover { background: #fafafa; }
 
 .monthly-item-left {
   flex: 1;
@@ -169,18 +155,43 @@
   color: #6b7280;
 }
 
-.monthly-item-right {
+/* Amount columns */
+.monthly-item-amounts {
   display: flex;
-  align-items: center;
-  gap: 20px;
+  flex-direction: column;
+  gap: 4px;
   flex-shrink: 0;
+  min-width: 140px;
 }
 
-.item-fee {
-  font-size: 18px;
-  font-weight: 800;
+.amount-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.amount-label {
+  font-size: 11px;
+  color: #9ca3af;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.amount-value {
+  font-size: 13px;
+  font-weight: 700;
   color: #1a1a2e;
-  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+
+.amount-billing {
+  color: #e94560;
+}
+
+/* Next due date */
+.monthly-item-right {
+  flex-shrink: 0;
 }
 
 .next-due-group {
@@ -207,9 +218,7 @@
   transition: border-color 0.2s;
 }
 
-.next-due-input:focus {
-  border-color: #e94560;
-}
+.next-due-input:focus { border-color: #e94560; }
 
 /* Service badges */
 .service-badge {
@@ -239,13 +248,9 @@
   transition: box-shadow 0.2s;
 }
 
-.client-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-}
+.client-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
 
-.client-card-head {
-  margin-bottom: 12px;
-}
+.client-card-head { margin-bottom: 12px; }
 
 .client-agent-label {
   font-size: 11px;
@@ -279,15 +284,8 @@
   font-size: 12px;
 }
 
-.service-fee {
-  font-weight: 600;
-  color: #1a1a2e;
-}
-
-.service-next-date {
-  color: #6b7280;
-  margin-left: auto;
-}
+.service-fee { font-weight: 600; color: #1a1a2e; }
+.service-next-date { color: #6b7280; margin-left: auto; }
 
 .client-actions {
   display: flex;
@@ -320,36 +318,10 @@
   box-shadow: 0 6px 20px rgba(233,69,96,0.5);
 }
 
-.btn-secondary {
-  background: #f0f2f5;
-  color: #6b7280;
-}
-
-.btn-secondary:hover {
-  background: #e5e7eb;
-  color: #1a1a2e;
-}
-
-.btn-danger {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-.btn-danger:hover {
-  background: #fecaca;
-}
-
-.btn-success {
-  background: #d1fae5;
-  color: #059669;
-}
-
-.btn-success:hover {
-  background: #a7f3d0;
-}
-
-.btn-sm {
-  padding: 6px 12px;
-  font-size: 12px;
-  border-radius: 7px;
-}
+.btn-secondary { background: #f0f2f5; color: #6b7280; }
+.btn-secondary:hover { background: #e5e7eb; color: #1a1a2e; }
+.btn-danger { background: #fee2e2; color: #dc2626; }
+.btn-danger:hover { background: #fecaca; }
+.btn-success { background: #d1fae5; color: #059669; }
+.btn-success:hover { background: #a7f3d0; }
+.btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 7px; }

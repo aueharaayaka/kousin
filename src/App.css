@@ -81,6 +81,30 @@
   color: #1a1a2e;
 }
 
+.list-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.month-picker {
+  padding: 6px 12px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1a1a2e;
+  background: #f9fafb;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.month-picker:focus {
+  border-color: #e94560;
+}
+
 .tabs {
   display: flex;
   gap: 4px;

@@ -6,75 +6,28 @@ import './App.css'
 
 const STORAGE_KEY = 'payment_schedules'
 
-const SAMPLE_DATA = [
-  {
-    id: '1',
-    title: '家賃',
-    amount: 80000,
-    dueDate: '2026-04-01',
-    category: 'housing',
-    status: 'pending',
-    recurring: 'monthly',
-    note: '',
-  },
-  {
-    id: '2',
-    title: '電気代',
-    amount: 8500,
-    dueDate: '2026-03-25',
-    category: 'utilities',
-    status: 'overdue',
-    recurring: 'monthly',
-    note: '3月分',
-  },
-  {
-    id: '3',
-    title: 'インターネット',
-    amount: 5500,
-    dueDate: '2026-03-20',
-    category: 'utilities',
-    status: 'paid',
-    recurring: 'monthly',
-    note: '',
-  },
-  {
-    id: '4',
-    title: 'クレジットカード',
-    amount: 45000,
-    dueDate: '2026-04-10',
-    category: 'credit',
-    status: 'pending',
-    recurring: 'monthly',
-    note: '3月利用分',
-  },
-  {
-    id: '5',
-    title: '保険料',
-    amount: 15000,
-    dueDate: '2026-04-15',
-    category: 'insurance',
-    status: 'pending',
-    recurring: 'monthly',
-    note: '',
-  },
-]
-
 export default function App() {
   const [payments, setPayments] = useState(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
-      return stored ? JSON.parse(stored) : SAMPLE_DATA
+      return stored ? JSON.parse(stored) : []
     } catch {
-      return SAMPLE_DATA
+      return []
     }
   })
   const [showForm, setShowForm] = useState(false)
   const [editingPayment, setEditingPayment] = useState(null)
   const [activeTab, setActiveTab] = useState('all')
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    const now = new Date()
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  })
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payments))
   }, [payments])
+
+  const filteredPayments = payments.filter(p => p.dueDate.startsWith(selectedMonth))
 
   const addPayment = (payment) => {
     setPayments(prev => [...prev, { ...payment, id: Date.now().toString() }])
@@ -123,31 +76,39 @@ export default function App() {
       </header>
 
       <main className="app-main">
-        <Dashboard payments={payments} />
+        <Dashboard payments={filteredPayments} />
 
         <div className="list-section">
           <div className="list-header">
             <h2>支払い一覧</h2>
-            <div className="tabs">
-              {['all', 'pending', 'overdue', 'paid'].map(tab => (
-                <button
-                  key={tab}
-                  className={`tab ${activeTab === tab ? 'active' : ''}`}
-                  onClick={() => setActiveTab(tab)}
-                >
-                  {tab === 'all' && 'すべて'}
-                  {tab === 'pending' && '未払い'}
-                  {tab === 'overdue' && '期限超過'}
-                  {tab === 'paid' && '支払済'}
-                  <span className="tab-count">
-                    {tab === 'all' ? payments.length : payments.filter(p => p.status === tab).length}
-                  </span>
-                </button>
-              ))}
+            <div className="list-header-controls">
+              <input
+                type="month"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="month-picker"
+              />
+              <div className="tabs">
+                {['all', 'pending', 'overdue', 'paid'].map(tab => (
+                  <button
+                    key={tab}
+                    className={`tab ${activeTab === tab ? 'active' : ''}`}
+                    onClick={() => setActiveTab(tab)}
+                  >
+                    {tab === 'all' && 'すべて'}
+                    {tab === 'pending' && '未払い'}
+                    {tab === 'overdue' && '期限超過'}
+                    {tab === 'paid' && '支払済'}
+                    <span className="tab-count">
+                      {tab === 'all' ? filteredPayments.length : filteredPayments.filter(p => p.status === tab).length}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
           <PaymentList
-            payments={payments}
+            payments={filteredPayments}
             filter={activeTab}
             onEdit={handleEdit}
             onDelete={deletePayment}

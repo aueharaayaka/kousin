@@ -53,8 +53,12 @@ export default function PaymentCard({ payment, onEdit, onDelete, onMarkPaid }) {
   return (
     <div className={`payment-card status-${payment.status}`}>
       <div className="card-left">
-        <div className="card-category">{CATEGORY_LABELS[payment.category] || payment.category}</div>
-        <div className="card-title">{payment.title}</div>
+        <div className="card-header-row">
+          <div className="card-title">{payment.title}</div>
+          {payment.serviceType && (
+            <span className="service-type-badge">{payment.serviceType}</span>
+          )}
+        </div>
         {payment.note && <div className="card-note">{payment.note}</div>}
         <div className="card-meta">
           <span className={`due-badge ${getDueDateClass()}`}>{getDueDateLabel()}</span>

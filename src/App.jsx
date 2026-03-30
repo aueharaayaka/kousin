@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import Dashboard from './components/Dashboard'
 import PaymentList from './components/PaymentList'
 import PaymentForm from './components/PaymentForm'
 import './App.css'
@@ -30,12 +29,34 @@ export default function App() {
   const filteredPayments = payments.filter(p => p.dueDate.startsWith(selectedMonth))
 
   const addPayment = (payment) => {
-    setPayments(prev => [...prev, { ...payment, id: Date.now().toString() }])
+    const { nextDueDate, ...data } = payment
+    const newPayments = [{ ...data, id: Date.now().toString() }]
+    if (nextDueDate) {
+      newPayments.push({
+        ...data,
+        id: (Date.now() + 1).toString(),
+        dueDate: nextDueDate,
+        status: 'pending',
+      })
+    }
+    setPayments(prev => [...prev, ...newPayments])
     setShowForm(false)
   }
 
   const updatePayment = (payment) => {
-    setPayments(prev => prev.map(p => p.id === payment.id ? payment : p))
+    const { nextDueDate, ...data } = payment
+    setPayments(prev => {
+      const updated = prev.map(p => p.id === data.id ? data : p)
+      if (nextDueDate) {
+        updated.push({
+          ...data,
+          id: Date.now().toString(),
+          dueDate: nextDueDate,
+          status: 'pending',
+        })
+      }
+      return updated
+    })
     setEditingPayment(null)
     setShowForm(false)
   }
@@ -76,8 +97,6 @@ export default function App() {
       </header>
 
       <main className="app-main">
-        <Dashboard payments={filteredPayments} />
-
         <div className="list-section">
           <div className="list-header">
             <h2>支払い一覧</h2>

@@ -1,11 +1,7 @@
 import React, { useState } from 'react'
 import './PaymentForm.css'
 
-const TITLE_OPTIONS = [
-  { value: 'サーバー', label: 'サーバー' },
-  { value: 'ドメイン', label: 'ドメイン' },
-  { value: 'SSL', label: 'SSL' },
-]
+const SERVICE_TYPES = ['サーバー', 'ドメイン', 'SSL']
 
 const CATEGORIES = [
   { value: 'housing', label: '住居費' },
@@ -25,12 +21,14 @@ const RECURRING_OPTIONS = [
 ]
 
 const INITIAL_STATE = {
-  title: 'サーバー',
+  title: '',
+  serviceType: '',
   amount: '',
   dueDate: '',
+  nextDueDate: '',
   category: 'other',
   status: 'pending',
-  recurring: 'none',
+  recurring: 'yearly',
   note: '',
 }
 
@@ -38,12 +36,13 @@ export default function PaymentForm({ payment, onSubmit, onClose }) {
   const [form, setForm] = useState(payment ? {
     ...payment,
     amount: payment.amount.toString(),
+    nextDueDate: '',
   } : INITIAL_STATE)
   const [errors, setErrors] = useState({})
 
   const validate = () => {
     const errs = {}
-    if (!form.title) errs.title = 'タイトルを選択してください'
+    if (!form.title.trim()) errs.title = 'タイトルを入力してください'
     if (!form.amount || isNaN(Number(form.amount)) || Number(form.amount) <= 0)
       errs.amount = '正しい金額を入力してください'
     if (!form.dueDate) errs.dueDate = '引き落とし日を選択してください'
@@ -54,6 +53,10 @@ export default function PaymentForm({ payment, onSubmit, onClose }) {
     const { name, value } = e.target
     setForm(prev => ({ ...prev, [name]: value }))
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }))
+  }
+
+  const toggleServiceType = (type) => {
+    setForm(prev => ({ ...prev, serviceType: prev.serviceType === type ? '' : type }))
   }
 
   const handleSubmit = (e) => {
@@ -76,17 +79,27 @@ export default function PaymentForm({ payment, onSubmit, onClose }) {
         <form onSubmit={handleSubmit} className="payment-form">
           <div className="form-group">
             <label>タイトル <span className="required">*</span></label>
-            <select
+            <input
+              type="text"
               name="title"
               value={form.title}
               onChange={handleChange}
+              placeholder="例: example.com"
               className={errors.title ? 'error' : ''}
-            >
-              {TITLE_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+            />
             {errors.title && <span className="error-msg">{errors.title}</span>}
+            <div className="service-type-group">
+              {SERVICE_TYPES.map(type => (
+                <button
+                  key={type}
+                  type="button"
+                  className={`service-type-btn ${form.serviceType === type ? 'active' : ''}`}
+                  onClick={() => toggleServiceType(type)}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="form-row">
@@ -114,6 +127,17 @@ export default function PaymentForm({ payment, onSubmit, onClose }) {
               />
               {errors.dueDate && <span className="error-msg">{errors.dueDate}</span>}
             </div>
+          </div>
+
+          <div className="form-group">
+            <label>次回支払い予定日</label>
+            <input
+              type="date"
+              name="nextDueDate"
+              value={form.nextDueDate}
+              onChange={handleChange}
+            />
+            <span className="field-hint">設定するとその日付で次回分の支払いが自動登録されます</span>
           </div>
 
           <div className="form-row">

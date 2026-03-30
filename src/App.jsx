@@ -1,82 +1,83 @@
 import React, { useState, useEffect } from 'react'
-import PaymentList from './components/PaymentList'
-import PaymentForm from './components/PaymentForm'
+import ClientForm from './components/ClientForm'
 import './App.css'
 
-const STORAGE_KEY = 'payment_schedules'
+const STORAGE_KEY = 'clients_data'
+
+const SERVICE_LABELS = { domain: 'ドメイン', server: 'サーバー', ssl: 'SSL' }
+
+const formatCurrency = (amount) =>
+  new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(Number(amount) || 0)
+
+const advanceOneYear = (dateStr) => {
+  if (!dateStr) return ''
+  const d = new Date(dateStr + 'T00:00:00')
+  d.setFullYear(d.getFullYear() + 1)
+  return d.toISOString().split('T')[0]
+}
 
 export default function App() {
-  const [payments, setPayments] = useState(() => {
+  const [clients, setClients] = useState(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
       return stored ? JSON.parse(stored) : []
-    } catch {
-      return []
-    }
+    } catch { return [] }
   })
   const [showForm, setShowForm] = useState(false)
-  const [editingPayment, setEditingPayment] = useState(null)
-  const [activeTab, setActiveTab] = useState('all')
+  const [editingClient, setEditingClient] = useState(null)
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const now = new Date()
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
   })
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(payments))
-  }, [payments])
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(clients))
+  }, [clients])
 
-  const filteredPayments = payments.filter(p => p.dueDate.startsWith(selectedMonth))
-
-  const addPayment = (payment) => {
-    const { nextDueDate, ...data } = payment
-    const newPayments = [{ ...data, id: Date.now().toString() }]
-    if (nextDueDate) {
-      newPayments.push({
-        ...data,
-        id: (Date.now() + 1).toString(),
-        dueDate: nextDueDate,
-        status: 'pending',
-      })
-    }
-    setPayments(prev => [...prev, ...newPayments])
-    setShowForm(false)
-  }
-
-  const updatePayment = (payment) => {
-    const { nextDueDate, ...data } = payment
-    setPayments(prev => {
-      const updated = prev.map(p => p.id === data.id ? data : p)
-      if (nextDueDate) {
-        updated.push({
-          ...data,
-          id: Date.now().toString(),
-          dueDate: nextDueDate,
-          status: 'pending',
-        })
+  const monthlyPayments = []
+  clients.forEach(client => {
+    ;['domain', 'server', 'ssl'].forEach(type => {
+      const service = client[type]
+      if (service?.nextDueDate?.startsWith(selectedMonth)) {
+        monthlyPayments.push({ client, serviceType: type, service })
       }
-      return updated
     })
-    setEditingPayment(null)
+  })
+
+  const addClient = (client) => {
+    setClients(prev => [...prev, { ...client, id: Date.now().toString() }])
     setShowForm(false)
   }
 
-  const deletePayment = (id) => {
-    setPayments(prev => prev.filter(p => p.id !== id))
+  const updateClient = (client) => {
+    setClients(prev => prev.map(c => c.id === client.id ? client : c))
+    setEditingClient(null)
+    setShowForm(false)
   }
 
-  const markAsPaid = (id) => {
-    setPayments(prev => prev.map(p => p.id === id ? { ...p, status: 'paid' } : p))
+  const deleteClient = (id) => {
+    setClients(prev => prev.filter(c => c.id !== id))
   }
 
-  const handleEdit = (payment) => {
-    setEditingPayment(payment)
+  const markPaid = (clientId, serviceType) => {
+    setClients(prev => prev.map(c => {
+      if (c.id !== clientId) return c
+      const service = c[serviceType]
+      return {
+        ...c,
+        [serviceType]: { ...service, nextDueDate: advanceOneYear(service.nextDueDate) },
+      }
+    }))
+  }
+
+  const handleEdit = (client) => {
+    setEditingClient(client)
     setShowForm(true)
   }
 
   const handleCloseForm = () => {
     setShowForm(false)
-    setEditingPayment(null)
+    setEditingClient(null)
   }
 
   return (
@@ -86,63 +87,149 @@ export default function App() {
           <div className="header-left">
             <div className="app-logo">$</div>
             <div>
-              <h1 className="app-title">支払いスケジュール管理</h1>
-              <p className="app-subtitle">Payment Schedule Manager</p>
+              <h1 className="app-title">支払い管理</h1>
+              <p className="app-subtitle">Payment Manager</p>
             </div>
           </div>
           <button className="btn btn-primary" onClick={() => setShowForm(true)}>
-            + 支払いを追加
+            + クライアントを登録
           </button>
         </div>
       </header>
 
       <main className="app-main">
-        <div className="list-section">
-          <div className="list-header">
-            <h2>支払い一覧</h2>
-            <div className="list-header-controls">
-              <input
-                type="month"
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="month-picker"
-              />
-              <div className="tabs">
-                {['all', 'pending', 'overdue', 'paid'].map(tab => (
-                  <button
-                    key={tab}
-                    className={`tab ${activeTab === tab ? 'active' : ''}`}
-                    onClick={() => setActiveTab(tab)}
-                  >
-                    {tab === 'all' && 'すべて'}
-                    {tab === 'pending' && '未払い'}
-                    {tab === 'overdue' && '期限超過'}
-                    {tab === 'paid' && '支払済'}
-                    <span className="tab-count">
-                      {tab === 'all' ? filteredPayments.length : filteredPayments.filter(p => p.status === tab).length}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
+        <div className="section">
+          <div className="section-header">
+            <h2>今月の支払い</h2>
+            <input
+              type="month"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="month-picker"
+            />
           </div>
-          <PaymentList
-            payments={filteredPayments}
-            filter={activeTab}
-            onEdit={handleEdit}
-            onDelete={deletePayment}
-            onMarkPaid={markAsPaid}
-          />
+          {monthlyPayments.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">📭</div>
+              <p>この月に予定されている支払いはありません</p>
+            </div>
+          ) : (
+            <div className="monthly-list">
+              {monthlyPayments.map(({ client, serviceType, service }) => (
+                <div key={`${client.id}-${serviceType}`} className="monthly-item">
+                  <div className="monthly-item-left">
+                    {client.agentName && (
+                      <div className="item-agent">{client.agentName}</div>
+                    )}
+                    <div className="item-client">{client.clientName}</div>
+                    <div className="item-meta">
+                      <span className={`service-badge service-${serviceType}`}>
+                        {SERVICE_LABELS[serviceType]}
+                      </span>
+                      <span className="item-date">{service.nextDueDate}</span>
+                    </div>
+                  </div>
+                  <div className="monthly-item-right">
+                    <div className="item-fee">{formatCurrency(service.fee)}</div>
+                    <button
+                      className="btn btn-sm btn-success"
+                      onClick={() => markPaid(client.id, serviceType)}
+                    >
+                      支払済にする
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="section">
+          <div className="section-header">
+            <h2>クライアント一覧</h2>
+          </div>
+          {clients.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">📋</div>
+              <p>登録されたクライアントはありません</p>
+            </div>
+          ) : (
+            <div className="client-grid">
+              {clients.map(client => (
+                <ClientCard
+                  key={client.id}
+                  client={client}
+                  onEdit={handleEdit}
+                  onDelete={deleteClient}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </main>
 
       {showForm && (
-        <PaymentForm
-          payment={editingPayment}
-          onSubmit={editingPayment ? updatePayment : addPayment}
+        <ClientForm
+          client={editingClient}
+          onSubmit={editingClient ? updateClient : addClient}
           onClose={handleCloseForm}
         />
       )}
+    </div>
+  )
+}
+
+function ClientCard({ client, onEdit, onDelete }) {
+  const [confirmDelete, setConfirmDelete] = useState(false)
+
+  const services = [
+    { key: 'domain', label: 'ドメイン' },
+    { key: 'server', label: 'サーバー' },
+    { key: 'ssl', label: 'SSL' },
+  ]
+
+  const hasServices = services.some(({ key }) => client[key]?.fee || client[key]?.nextDueDate)
+
+  return (
+    <div className="client-card">
+      <div className="client-card-head">
+        {client.agentName && (
+          <div className="client-agent-label">{client.agentName}</div>
+        )}
+        <div className="client-name-label">{client.clientName}</div>
+      </div>
+      {hasServices && (
+        <div className="client-services">
+          {services.map(({ key, label }) => {
+            const s = client[key]
+            if (!s?.fee && !s?.nextDueDate) return null
+            return (
+              <div key={key} className="client-service-row">
+                <span className={`service-badge service-${key}`}>{label}</span>
+                {s.fee ? (
+                  <span className="service-fee">
+                    {new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(Number(s.fee))}
+                  </span>
+                ) : null}
+                {s.nextDueDate && (
+                  <span className="service-next-date">次回: {s.nextDueDate}</span>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+      <div className="client-actions">
+        <button className="btn btn-sm btn-secondary" onClick={() => onEdit(client)}>編集</button>
+        {confirmDelete ? (
+          <>
+            <button className="btn btn-sm btn-danger" onClick={() => onDelete(client.id)}>確認</button>
+            <button className="btn btn-sm btn-secondary" onClick={() => setConfirmDelete(false)}>キャンセル</button>
+          </>
+        ) : (
+          <button className="btn btn-sm btn-danger" onClick={() => setConfirmDelete(true)}>削除</button>
+        )}
+      </div>
     </div>
   )
 }

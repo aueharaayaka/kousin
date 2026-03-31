@@ -9,6 +9,65 @@ const SERVICE_LABELS = { domain: 'ドメイン', server: 'サーバー', ssl: 'S
 const formatCurrency = (amount) =>
   new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(Number(amount) || 0)
 
+function MonthlyItem({ client, serviceType, service, checked, onUpdateNextDueDate }) {
+  const [inputValue, setInputValue] = useState('')
+  const isChecked = checked || inputValue !== ''
+
+  const handleBlur = () => {
+    if (inputValue) onUpdateNextDueDate(client.id, serviceType, inputValue)
+  }
+
+  return (
+    <div className={`monthly-item${isChecked ? ' is-checked' : ''}`}>
+      <div className="monthly-item-left">
+        {client.agentName && <div className="item-agent">{client.agentName}</div>}
+        <div className="item-client">{client.clientName}</div>
+        <div className="item-meta">
+          <span className={`service-badge service-${serviceType}`}>{SERVICE_LABELS[serviceType]}</span>
+          <span className="item-date">{service.nextDueDate}</span>
+        </div>
+      </div>
+
+      <div className="monthly-item-amounts">
+        {service.fee !== '' && service.fee !== undefined && (
+          <div className="amount-row">
+            <span className="amount-label">管理費</span>
+            <span className="amount-value">{formatCurrency(service.fee)}</span>
+          </div>
+        )}
+        {service.billingAmount !== '' && service.billingAmount !== undefined && (
+          <div className="amount-row">
+            <span className="amount-label">請求額</span>
+            <span className="amount-value amount-billing">{formatCurrency(service.billingAmount)}</span>
+          </div>
+        )}
+        {serviceType === 'ssl' && service.manualFee !== '' && service.manualFee !== undefined && (
+          <div className="amount-row">
+            <span className="amount-label">手動代行費</span>
+            <span className="amount-value">{formatCurrency(service.manualFee)}</span>
+          </div>
+        )}
+      </div>
+
+      <div className="monthly-item-right">
+        <div className="next-due-group">
+          <span className="next-due-label">次回支払い予定日</span>
+          <div className="next-due-input-row">
+            <input
+              type="date"
+              className="next-due-input"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onBlur={handleBlur}
+            />
+            {isChecked && inputValue && <span className="check-mark">✔</span>}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const [clients, setClients] = useState(() => {
     try {
@@ -22,19 +81,16 @@ export default function App() {
     const now = new Date()
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
   })
-  // 次回支払日が入力済みのアイテムを追跡（月変更でリセット）
   const [checkedKeys, setCheckedKeys] = useState(new Set())
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(clients))
   }, [clients])
 
-  // 月変更時はチェック状態をリセット
   useEffect(() => {
     setCheckedKeys(new Set())
   }, [selectedMonth])
 
-  // nextDueDateが選択月に一致 OR チェック済みのアイテムを表示
   const monthlyPayments = []
   clients.forEach(client => {
     ;['domain', 'server', 'ssl'].forEach(type => {
@@ -116,58 +172,14 @@ export default function App() {
           ) : (
             <div className="monthly-list">
               {monthlyPayments.map(({ client, serviceType, service, checked }) => (
-                <div key={`${client.id}-${serviceType}`} className={`monthly-item${checked ? ' is-checked' : ''}`}>
-                  <div className="monthly-item-left">
-                    {client.agentName && (
-                      <div className="item-agent">{client.agentName}</div>
-                    )}
-                    <div className="item-client">{client.clientName}</div>
-                    <div className="item-meta">
-                      <span className={`service-badge service-${serviceType}`}>
-                        {SERVICE_LABELS[serviceType]}
-                      </span>
-                      <span className="item-date">{service.nextDueDate}</span>
-                    </div>
-                  </div>
-
-                  <div className="monthly-item-amounts">
-                    {service.fee !== '' && service.fee !== undefined && (
-                      <div className="amount-row">
-                        <span className="amount-label">管理費</span>
-                        <span className="amount-value">{formatCurrency(service.fee)}</span>
-                      </div>
-                    )}
-                    {service.billingAmount !== '' && service.billingAmount !== undefined && (
-                      <div className="amount-row">
-                        <span className="amount-label">請求額</span>
-                        <span className="amount-value amount-billing">{formatCurrency(service.billingAmount)}</span>
-                      </div>
-                    )}
-                    {serviceType === 'ssl' && service.manualFee !== '' && service.manualFee !== undefined && (
-                      <div className="amount-row">
-                        <span className="amount-label">手動代行費</span>
-                        <span className="amount-value">{formatCurrency(service.manualFee)}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="monthly-item-right">
-                    <div className="next-due-group">
-                      <span className="next-due-label">次回支払い予定日</span>
-                      <div className="next-due-input-row">
-                        <input
-                          type="date"
-                          className="next-due-input"
-                          defaultValue=""
-                          onBlur={(e) => {
-                            if (e.target.value) updateNextDueDate(client.id, serviceType, e.target.value)
-                          }}
-                        />
-                        {checked && <span className="check-mark">✔</span>}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <MonthlyItem
+                  key={`${client.id}-${serviceType}`}
+                  client={client}
+                  serviceType={serviceType}
+                  service={service}
+                  checked={checked}
+                  onUpdateNextDueDate={updateNextDueDate}
+                />
               ))}
             </div>
           )}
@@ -224,9 +236,7 @@ function ClientCard({ client, onEdit, onDelete }) {
   return (
     <div className="client-card">
       <div className="client-card-head">
-        {client.agentName && (
-          <div className="client-agent-label">{client.agentName}</div>
-        )}
+        {client.agentName && <div className="client-agent-label">{client.agentName}</div>}
         <div className="client-name-label">{client.clientName}</div>
       </div>
       {hasServices && (

@@ -40,16 +40,8 @@
   color: white;
 }
 
-.app-title {
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.app-subtitle {
-  font-size: 12px;
-  color: rgba(255,255,255,0.55);
-  margin-top: 2px;
-}
+.app-title { font-size: 20px; font-weight: 700; }
+.app-subtitle { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 2px; }
 
 .app-main {
   max-width: 1100px;
@@ -77,11 +69,7 @@
   border-bottom: 1px solid #f0f2f5;
 }
 
-.section-header h2 {
-  font-size: 17px;
-  font-weight: 700;
-  color: #1a1a2e;
-}
+.section-header h2 { font-size: 17px; font-weight: 700; color: #1a1a2e; }
 
 .month-picker {
   padding: 6px 12px;
@@ -94,17 +82,9 @@
   outline: none;
   transition: border-color 0.2s;
 }
+.month-picker:focus { border-color: #e94560; }
 
-.month-picker:focus {
-  border-color: #e94560;
-}
-
-.empty-state {
-  padding: 40px;
-  text-align: center;
-  color: #9ca3af;
-}
-
+.empty-state { padding: 40px; text-align: center; color: #9ca3af; }
 .empty-icon { font-size: 32px; margin-bottom: 10px; }
 .empty-state p { font-size: 14px; }
 
@@ -119,14 +99,17 @@
   border-bottom: 1px solid #f5f6fa;
   transition: background 0.15s;
 }
-
 .monthly-item:last-child { border-bottom: none; }
 .monthly-item:hover { background: #fafafa; }
 
-.monthly-item-left {
-  flex: 1;
-  min-width: 0;
+.monthly-item.is-checked {
+  background: #f0fdf4;
 }
+.monthly-item.is-checked:hover {
+  background: #dcfce7;
+}
+
+.monthly-item-left { flex: 1; min-width: 0; }
 
 .item-agent {
   font-size: 11px;
@@ -137,23 +120,10 @@
   margin-bottom: 2px;
 }
 
-.item-client {
-  font-size: 15px;
-  font-weight: 700;
-  color: #1a1a2e;
-  margin-bottom: 5px;
-}
+.item-client { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 5px; }
 
-.item-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.item-date {
-  font-size: 12px;
-  color: #6b7280;
-}
+.item-meta { display: flex; align-items: center; gap: 8px; }
+.item-date { font-size: 12px; color: #6b7280; }
 
 /* Amount columns */
 .monthly-item-amounts {
@@ -171,28 +141,12 @@
   gap: 10px;
 }
 
-.amount-label {
-  font-size: 11px;
-  color: #9ca3af;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.amount-value {
-  font-size: 13px;
-  font-weight: 700;
-  color: #1a1a2e;
-  white-space: nowrap;
-}
-
-.amount-billing {
-  color: #e94560;
-}
+.amount-label { font-size: 11px; color: #9ca3af; font-weight: 500; white-space: nowrap; }
+.amount-value { font-size: 13px; font-weight: 700; color: #1a1a2e; white-space: nowrap; }
+.amount-billing { color: #e94560; }
 
 /* Next due date */
-.monthly-item-right {
-  flex-shrink: 0;
-}
+.monthly-item-right { flex-shrink: 0; }
 
 .next-due-group {
   display: flex;
@@ -201,10 +155,12 @@
   align-items: flex-end;
 }
 
-.next-due-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: #9ca3af;
+.next-due-label { font-size: 11px; font-weight: 600; color: #9ca3af; }
+
+.next-due-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .next-due-input {
@@ -217,17 +173,17 @@
   background: white;
   transition: border-color 0.2s;
 }
-
 .next-due-input:focus { border-color: #e94560; }
 
-/* Service badges */
-.service-badge {
-  font-size: 11px;
+.check-mark {
+  font-size: 16px;
+  color: #10b981;
   font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 20px;
+  line-height: 1;
 }
 
+/* Service badges */
+.service-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
 .service-domain { background: #dbeafe; color: #1d4ed8; }
 .service-server { background: #dcfce7; color: #166534; }
 .service-ssl    { background: #fef3c7; color: #92400e; }
@@ -247,9 +203,7 @@
   background: white;
   transition: box-shadow 0.2s;
 }
-
 .client-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
-
 .client-card-head { margin-bottom: 12px; }
 
 .client-agent-label {
@@ -260,12 +214,7 @@
   letter-spacing: 0.5px;
   margin-bottom: 2px;
 }
-
-.client-name-label {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1a1a2e;
-}
+.client-name-label { font-size: 16px; font-weight: 700; color: #1a1a2e; }
 
 .client-services {
   display: flex;
@@ -277,21 +226,10 @@
   border-radius: 8px;
 }
 
-.client-service-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-}
-
+.client-service-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
 .service-fee { font-weight: 600; color: #1a1a2e; }
 .service-next-date { color: #6b7280; margin-left: auto; }
-
-.client-actions {
-  display: flex;
-  gap: 6px;
-  justify-content: flex-end;
-}
+.client-actions { display: flex; gap: 6px; justify-content: flex-end; }
 
 /* Buttons */
 .btn {
@@ -306,18 +244,12 @@
   align-items: center;
   gap: 6px;
 }
-
 .btn-primary {
   background: linear-gradient(135deg, #e94560, #c23152);
   color: white;
   box-shadow: 0 4px 15px rgba(233,69,96,0.4);
 }
-
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(233,69,96,0.5);
-}
-
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(233,69,96,0.5); }
 .btn-secondary { background: #f0f2f5; color: #6b7280; }
 .btn-secondary:hover { background: #e5e7eb; color: #1a1a2e; }
 .btn-danger { background: #fee2e2; color: #dc2626; }

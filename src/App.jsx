@@ -22,17 +22,26 @@ export default function App() {
     const now = new Date()
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
   })
+  // 次回支払日が入力済みのアイテムを追跡（月変更でリセット）
+  const [checkedKeys, setCheckedKeys] = useState(new Set())
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(clients))
   }, [clients])
 
+  // 月変更時はチェック状態をリセット
+  useEffect(() => {
+    setCheckedKeys(new Set())
+  }, [selectedMonth])
+
+  // nextDueDateが選択月に一致 OR チェック済みのアイテムを表示
   const monthlyPayments = []
   clients.forEach(client => {
     ;['domain', 'server', 'ssl'].forEach(type => {
       const service = client[type]
-      if (service?.nextDueDate?.startsWith(selectedMonth)) {
-        monthlyPayments.push({ client, serviceType: type, service })
+      const key = `${client.id}-${type}`
+      if (service?.nextDueDate?.startsWith(selectedMonth) || checkedKeys.has(key)) {
+        monthlyPayments.push({ client, serviceType: type, service, checked: checkedKeys.has(key) })
       }
     })
   })
@@ -53,12 +62,11 @@ export default function App() {
   }
 
   const updateNextDueDate = (clientId, serviceType, nextDueDate) => {
+    const key = `${clientId}-${serviceType}`
+    setCheckedKeys(prev => new Set([...prev, key]))
     setClients(prev => prev.map(c => {
       if (c.id !== clientId) return c
-      return {
-        ...c,
-        [serviceType]: { ...c[serviceType], nextDueDate },
-      }
+      return { ...c, [serviceType]: { ...c[serviceType], nextDueDate } }
     }))
   }
 
@@ -107,8 +115,8 @@ export default function App() {
             </div>
           ) : (
             <div className="monthly-list">
-              {monthlyPayments.map(({ client, serviceType, service }) => (
-                <div key={`${client.id}-${serviceType}`} className="monthly-item">
+              {monthlyPayments.map(({ client, serviceType, service, checked }) => (
+                <div key={`${client.id}-${serviceType}`} className={`monthly-item${checked ? ' is-checked' : ''}`}>
                   <div className="monthly-item-left">
                     {client.agentName && (
                       <div className="item-agent">{client.agentName}</div>
@@ -146,14 +154,17 @@ export default function App() {
                   <div className="monthly-item-right">
                     <div className="next-due-group">
                       <span className="next-due-label">次回支払い予定日</span>
-                      <input
-                        type="date"
-                        className="next-due-input"
-                        defaultValue=""
-                        onBlur={(e) => {
-                          if (e.target.value) updateNextDueDate(client.id, serviceType, e.target.value)
-                        }}
-                      />
+                      <div className="next-due-input-row">
+                        <input
+                          type="date"
+                          className="next-due-input"
+                          defaultValue=""
+                          onBlur={(e) => {
+                            if (e.target.value) updateNextDueDate(client.id, serviceType, e.target.value)
+                          }}
+                        />
+                        {checked && <span className="check-mark">✔</span>}
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -1,11 +1,7 @@
 import React, { useState } from 'react'
 import './PaymentForm.css'
 
-const TITLE_OPTIONS = [
-  { value: 'サーバー', label: 'サーバー' },
-  { value: 'ドメイン', label: 'ドメイン' },
-  { value: 'SSL', label: 'SSL' },
-]
+const SERVICE_TYPES = ['サーバー', 'ドメイン', 'SSL']
 
 const CATEGORIES = [
   { value: 'housing', label: '住居費' },
@@ -25,25 +21,31 @@ const RECURRING_OPTIONS = [
 ]
 
 const INITIAL_STATE = {
-  title: 'サーバー',
+  agent: '',
+  client: '',
+  serviceType: '',
   amount: '',
   dueDate: '',
+  nextDueDate: '',
   category: 'other',
   status: 'pending',
-  recurring: 'none',
+  recurring: 'yearly',
   note: '',
 }
 
 export default function PaymentForm({ payment, onSubmit, onClose }) {
   const [form, setForm] = useState(payment ? {
     ...payment,
+    agent: payment.agent || '',
+    client: payment.client || payment.title || '',
     amount: payment.amount.toString(),
+    nextDueDate: '',
   } : INITIAL_STATE)
   const [errors, setErrors] = useState({})
 
   const validate = () => {
     const errs = {}
-    if (!form.title) errs.title = 'タイトルを選択してください'
+    if (!form.client.trim()) errs.client = 'クライアントを入力してください'
     if (!form.amount || isNaN(Number(form.amount)) || Number(form.amount) <= 0)
       errs.amount = '正しい金額を入力してください'
     if (!form.dueDate) errs.dueDate = '引き落とし日を選択してください'
@@ -56,6 +58,10 @@ export default function PaymentForm({ payment, onSubmit, onClose }) {
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }))
   }
 
+  const toggleServiceType = (type) => {
+    setForm(prev => ({ ...prev, serviceType: prev.serviceType === type ? '' : type }))
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
     const errs = validate()
@@ -63,7 +69,7 @@ export default function PaymentForm({ payment, onSubmit, onClose }) {
       setErrors(errs)
       return
     }
-    onSubmit({ ...form, amount: Number(form.amount) })
+    onSubmit({ ...form, title: form.client, amount: Number(form.amount) })
   }
 
   return (
@@ -75,18 +81,39 @@ export default function PaymentForm({ payment, onSubmit, onClose }) {
         </div>
         <form onSubmit={handleSubmit} className="payment-form">
           <div className="form-group">
-            <label>タイトル <span className="required">*</span></label>
-            <select
-              name="title"
-              value={form.title}
+            <label>エージェント</label>
+            <input
+              type="text"
+              name="agent"
+              value={form.agent}
               onChange={handleChange}
-              className={errors.title ? 'error' : ''}
-            >
-              {TITLE_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              placeholder="例: エージェント名"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>クライアント <span className="required">*</span></label>
+            <input
+              type="text"
+              name="client"
+              value={form.client}
+              onChange={handleChange}
+              placeholder="例: example.com"
+              className={errors.client ? 'error' : ''}
+            />
+            {errors.client && <span className="error-msg">{errors.client}</span>}
+            <div className="service-type-group">
+              {SERVICE_TYPES.map(type => (
+                <button
+                  key={type}
+                  type="button"
+                  className={`service-type-btn ${form.serviceType === type ? 'active' : ''}`}
+                  onClick={() => toggleServiceType(type)}
+                >
+                  {type}
+                </button>
               ))}
-            </select>
-            {errors.title && <span className="error-msg">{errors.title}</span>}
+            </div>
           </div>
 
           <div className="form-row">
@@ -114,6 +141,17 @@ export default function PaymentForm({ payment, onSubmit, onClose }) {
               />
               {errors.dueDate && <span className="error-msg">{errors.dueDate}</span>}
             </div>
+          </div>
+
+          <div className="form-group">
+            <label>次回支払い予定日</label>
+            <input
+              type="date"
+              name="nextDueDate"
+              value={form.nextDueDate}
+              onChange={handleChange}
+            />
+            <span className="field-hint">設定するとその日付で次回分の支払いが自動登録されます</span>
           </div>
 
           <div className="form-row">

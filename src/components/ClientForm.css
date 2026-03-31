@@ -1,0 +1,150 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal {
+  background: white;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 24px 0;
+}
+
+.modal-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.modal-close {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: #f0f2f5;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  background: #e5e7eb;
+  color: #1a1a2e;
+}
+
+.client-form {
+  padding: 18px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-group input {
+  padding: 9px 12px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 9px;
+  font-size: 14px;
+  color: #1a1a2e;
+  outline: none;
+  transition: border-color 0.2s;
+  background: white;
+}
+
+.form-group input:focus {
+  border-color: #e94560;
+}
+
+.form-group input.error {
+  border-color: #ef4444;
+}
+
+.error-msg {
+  font-size: 11px;
+  color: #ef4444;
+}
+
+.required {
+  color: #ef4444;
+}
+
+.services-divider {
+  font-size: 11px;
+  font-weight: 700;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 4px 0 2px;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.service-section {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border-left: 3px solid transparent;
+}
+
+.service-section-domain {
+  background: #eff6ff;
+  border-left-color: #1d4ed8;
+}
+
+.service-section-server {
+  background: #f0fdf4;
+  border-left-color: #166534;
+}
+
+.service-section-ssl {
+  background: #fffbeb;
+  border-left-color: #92400e;
+}
+
+.service-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 10px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-top: 4px;
+}

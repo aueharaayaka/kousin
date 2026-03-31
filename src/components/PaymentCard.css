@@ -34,7 +34,7 @@
   min-width: 0;
 }
 
-.card-category {
+.card-agent {
   font-size: 11px;
   font-weight: 600;
   color: #9ca3af;
@@ -43,11 +43,26 @@
   margin-bottom: 4px;
 }
 
+.card-header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
 .card-title {
   font-size: 16px;
   font-weight: 700;
   color: #1a1a2e;
-  margin-bottom: 4px;
+}
+
+.service-type-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: #e0e7ff;
+  color: #3730a3;
 }
 
 .card-note {

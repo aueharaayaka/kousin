@@ -9,9 +9,14 @@ const SERVICE_LABELS = { domain: 'ドメイン', server: 'サーバー', ssl: 'S
 const formatCurrency = (amount) =>
   new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(Number(amount) || 0)
 
-function MonthlyItem({ client, serviceType, service, checked, onUpdateNextDueDate }) {
-  const [inputValue, setInputValue] = useState('')
-  const isChecked = checked || inputValue !== ''
+function MonthlyItem({ client, serviceType, service, selectedMonth, onUpdateNextDueDate }) {
+  // この月に処理済みなら次回日を初期値に設定
+  const alreadyProcessed = service.lastPaidMonth === selectedMonth
+  const [inputValue, setInputValue] = useState(
+    alreadyProcessed ? (service.nextDueDate || '') : ''
+  )
+
+  const isChecked = alreadyProcessed || inputValue !== ''
 
   const handleBlur = () => {
     if (inputValue) onUpdateNextDueDate(client.id, serviceType, inputValue)
@@ -81,23 +86,21 @@ export default function App() {
     const now = new Date()
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
   })
-  const [checkedKeys, setCheckedKeys] = useState(new Set())
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(clients))
   }, [clients])
 
-  useEffect(() => {
-    setCheckedKeys(new Set())
-  }, [selectedMonth])
-
+  // nextDueDateが選択月に一致 OR この月に処理済みのアイテムを表示
   const monthlyPayments = []
   clients.forEach(client => {
     ;['domain', 'server', 'ssl'].forEach(type => {
       const service = client[type]
-      const key = `${client.id}-${type}`
-      if (service?.nextDueDate?.startsWith(selectedMonth) || checkedKeys.has(key)) {
-        monthlyPayments.push({ client, serviceType: type, service, checked: checkedKeys.has(key) })
+      if (
+        service?.nextDueDate?.startsWith(selectedMonth) ||
+        service?.lastPaidMonth === selectedMonth
+      ) {
+        monthlyPayments.push({ client, serviceType: type, service })
       }
     })
   })
@@ -118,11 +121,16 @@ export default function App() {
   }
 
   const updateNextDueDate = (clientId, serviceType, nextDueDate) => {
-    const key = `${clientId}-${serviceType}`
-    setCheckedKeys(prev => new Set([...prev, key]))
     setClients(prev => prev.map(c => {
       if (c.id !== clientId) return c
-      return { ...c, [serviceType]: { ...c[serviceType], nextDueDate } }
+      return {
+        ...c,
+        [serviceType]: {
+          ...c[serviceType],
+          nextDueDate,
+          lastPaidMonth: selectedMonth,
+        },
+      }
     }))
   }
 
@@ -171,13 +179,13 @@ export default function App() {
             </div>
           ) : (
             <div className="monthly-list">
-              {monthlyPayments.map(({ client, serviceType, service, checked }) => (
+              {monthlyPayments.map(({ client, serviceType, service }) => (
                 <MonthlyItem
-                  key={`${client.id}-${serviceType}`}
+                  key={`${client.id}-${serviceType}-${selectedMonth}`}
                   client={client}
                   serviceType={serviceType}
                   service={service}
-                  checked={checked}
+                  selectedMonth={selectedMonth}
                   onUpdateNextDueDate={updateNextDueDate}
                 />
               ))}
